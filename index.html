@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VELO — Premium Bike Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2ee;
+    --cream: #e8e3da;
+    --rust: #c84b2f;
+    --rust-dark: #9e3920;
+    --steel: #4a5568;
+    --light-steel: #a0aec0;
+    --card-bg: #111111;
+    --nav-height: 72px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--rust);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, width 0.2s ease, height 0.2s ease;
+    mix-blend-mode: normal;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,75,47,0.5);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.2s ease;
+  }
+  .cursor.hover { width: 20px; height: 20px; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    z-index: 100;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.12em;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-logo span { color: var(--rust); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    color: var(--light-steel);
+    text-decoration: none;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    background: var(--rust);
+    color: var(--white) !important;
+    padding: 10px 22px;
+    border-radius: 2px;
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--rust-dark) !important; color: var(--white) !important; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: none; background: none; border: none; padding: 4px; }
+  .hamburger span { display: block; width: 24px; height: 2px; background: var(--white); transition: all 0.3s; }
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: var(--nav-height);
+    left: 0; right: 0;
+    background: rgba(10,10,10,0.97);
+    backdrop-filter: blur(16px);
+    padding: 32px 48px;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 99;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 0 48px;
+    padding-top: var(--nav-height);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 75% 50%, rgba(200,75,47,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .hero-content { position: relative; z-index: 2; }
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--rust);
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 8vw, 7.5rem);
+    line-height: 0.9;
+    letter-spacing: 0.04em;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.35s forwards;
+  }
+  h1 em { color: var(--rust); font-style: normal; }
+  .hero-desc {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--light-steel);
+    max-width: 440px;
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.65s forwards;
+  }
+  .btn-primary {
+    background: var(--rust);
+    color: var(--white);
+    padding: 16px 36px;
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--rust-dark); transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    padding: 16px 36px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: none;
+    transition: border-color 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--white); transform: translateY(-2px); }
+  .hero-stats {
+    display: flex;
+    gap: 48px;
+    margin-top: 64px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-num span { color: var(--rust); }
+  .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--light-steel); margin-top: 4px; }
+
+  .hero-visual {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 1.2s 0.4s forwards;
+  }
+  .hero-bike-svg {
+    width: 100%;
+    max-width: 560px;
+    filter: drop-shadow(0 0 60px rgba(200,75,47,0.15));
+  }
+  .hero-accent-ring {
+    position: absolute;
+    width: 420px; height: 420px;
+    border: 1px solid rgba(200,75,47,0.12);
+    border-radius: 50%;
+    animation: spin 20s linear infinite;
+    pointer-events: none;
+  }
+  .hero-accent-ring-2 {
+    width: 560px; height: 560px;
+    border-color: rgba(255,255,255,0.04);
+    animation-duration: 35s;
+    animation-direction: reverse;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 18px 0;
+    overflow: hidden;
+    background: rgba(255,255,255,0.02);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marqueeScroll 22s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--light-steel);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .marquee-item::after { content: '◆'; color: var(--rust); font-size: 0.5rem; }
+  @keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* SECTION COMMONS */
+  section { padding: 120px 48px; }
+  .section-tag {
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-tag::before { content: ''; display: block; width: 24px; height: 1px; background: var(--rust); }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 1rem;
+    color: var(--light-steel);
+    line-height: 1.7;
+    max-width: 520px;
+  }
+
+  /* BIKES GRID */
+  #bikes { background: var(--black); }
+  .section-header { margin-bottom: 64px; }
+  .bikes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .bike-card {
+    background: var(--card-bg);
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    group: true;
+    transition: transform 0.3s ease;
+  }
+  .bike-card:hover { transform: translateY(-4px); z-index: 2; }
+  .bike-card-inner { padding: 40px 36px 36px; }
+  .bike-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 1px;
+    margin-bottom: 24px;
+  }
+  .badge-new { background: var(--rust); color: var(--white); }
+  .badge-popular { background: rgba(255,255,255,0.1); color: var(--white); }
+  .badge-sale { background: #2d7a3a; color: var(--white); }
+  .bike-visual {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .bike-svg-container { transition: transform 0.4s ease; }
+  .bike-card:hover .bike-svg-container { transform: scale(1.05) rotate(-1deg); }
+  .bike-model {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+  .bike-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+  }
+  .bike-desc { font-size: 0.88rem; color: var(--light-steel); line-height: 1.6; margin-bottom: 24px; }
+  .bike-specs { display: flex; gap: 24px; margin-bottom: 28px; }
+  .spec-item { }
+  .spec-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--white); }
+  .spec-key { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light-steel); }
+  .bike-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px; }
+  .bike-price { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; }
+  .bike-price .old { font-size: 1rem; color: var(--light-steel); text-decoration: line-through; margin-right: 8px; font-family: 'DM Sans', sans-serif; }
+  .add-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .add-btn:hover { background: var(--rust); border-color: var(--rust); }
+  .bike-card-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 100%, rgba(200,75,47,0.06) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+  .bike-card:hover .bike-card-glow { opacity: 1; }
+
+  /* FEATURES */
+  #features {
+    background: linear-gradient(180deg, #0a0a0a 0%, #0e0e0e 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  #features::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    width: 1px;
+    height: 100%;
+    background: rgba(255,255,255,0.04);
+  }
+  .features-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .features-list { margin-top: 48px; display: flex; flex-direction: column; gap: 0; }
+  .feature-item {
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    cursor: none;
+    transition: padding-left 0.3s;
+  }
+  .feature-item:hover { padding-left: 12px; }
+  .feature-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+  .feature-item-title { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+  .feature-item-desc { font-size: 0.88rem; color: var(--light-steel); line-height: 1.6; }
+  .features-visual { position: relative; }
+  .features-big-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(6rem, 14vw, 12rem);
+    color: rgba(255,255,255,0.03);
+    line-height: 1;
+    position: absolute;
+    top: -40px; right: -20px;
+    pointer-events: none;
+    letter-spacing: -0.02em;
+  }
+  .features-image-frame {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .frame-tag {
+    position: absolute;
+    top: 20px; left: 20px;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    background: rgba(200,75,47,0.1);
+    padding: 4px 10px;
+    border-radius: 1px;
+  }
+  .service-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  .service-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 20px;
+    border-radius: 2px;
+    text-align: center;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: none;
+  }
+  .service-card:hover { border-color: var(--rust); background: rgba(200,75,47,0.04); }
+  .service-card-icon { font-size: 2rem; margin-bottom: 8px; }
+  .service-card-title { font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; }
+  .service-card-sub { font-size: 0.72rem; color: var(--light-steel); }
+
+  /* TESTIMONIALS */
+  #testimonials { background: #080808; }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 64px;
+  }
+  .testimonial-card {
+    background: var(--card-bg);
+    padding: 36px;
+    position: relative;
+    cursor: none;
+    transition: background 0.3s;
+  }
+  .testimonial-card:hover { background: #161616; }
+  .stars { color: var(--rust); font-size: 0.9rem; margin-bottom: 20px; letter-spacing: 2px; }
+  .testimonial-text {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--cream);
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .testimonial-author { display: flex; align-items: center; gap: 14px; }
+  .author-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rust), var(--rust-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .author-name { font-size: 0.9rem; font-weight: 600; }
+  .author-detail { font-size: 0.75rem; color: var(--light-steel); }
+
+  /* CONTACT / CTA */
+  #contact {
+    background: var(--black);
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .contact-form { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--light-steel); }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--white);
+    padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--rust);
+    background: rgba(200,75,47,0.04);
+  }
+  .form-group select option { background: #1a1a1a; }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+  .form-submit {
+    background: var(--rust);
+    color: var(--white);
+    border: none;
+    padding: 16px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: none;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.15s;
+    align-self: flex-start;
+  }
+  .form-submit:hover { background: var(--rust-dark); transform: translateY(-2px); }
+  .form-success {
+    display: none;
+    background: rgba(45,122,58,0.15);
+    border: 1px solid rgba(45,122,58,0.4);
+    padding: 16px 20px;
+    border-radius: 2px;
+    color: #6fcf7e;
+    font-size: 0.9rem;
+  }
+
+  .contact-info { padding-top: 48px; }
+  .info-block { margin-bottom: 36px; }
+  .info-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--rust); margin-bottom: 8px; }
+  .info-val { font-size: 1rem; color: var(--cream); line-height: 1.6; }
+  .hours-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 24px; }
+  .hours-day { font-size: 0.85rem; color: var(--light-steel); }
+  .hours-time { font-size: 0.85rem; }
+  .map-placeholder {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light-steel);
+    font-size: 0.85rem;
+    margin-top: 28px;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+  }
+  .map-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  .map-pin { font-size: 2rem; position: relative; z-index: 1; }
+
+  /* FOOTER */
+  footer {
+    background: #060606;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 64px 48px 32px;
+  }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+  .footer-brand .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.12em;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .footer-brand .logo span { color: var(--rust); }
+  .footer-brand p { font-size: 0.88rem; color: var(--light-steel); line-height: 1.7; max-width: 280px; }
+  .footer-col h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--white); margin-bottom: 20px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-col ul a { font-size: 0.88rem; color: var(--light-steel); text-decoration: none; transition: color 0.2s; }
+  .footer-col ul a:hover { color: var(--rust); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-copy { font-size: 0.8rem; color: var(--light-steel); }
+  .social-links { display: flex; gap: 16px; }
+  .social-link {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--light-steel);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    cursor: none;
+  }
+  .social-link:hover { border-color: var(--rust); color: var(--rust); background: rgba(200,75,47,0.08); }
+
+  /* CART SIDEBAR */
+  .cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(4px);
+  }
+  .cart-overlay.open { opacity: 1; pointer-events: all; }
+  .cart-sidebar {
+    position: fixed;
+    top: 0; right: 0;
+    width: 420px; height: 100vh;
+    background: #111;
+    z-index: 201;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.23,1,0.32,1);
+    border-left: 1px solid rgba(255,255,255,0.08);
+  }
+  .cart-sidebar.open { transform: translateX(0); }
+  .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .cart-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.06em; }
+  .cart-close { background: none; border: none; color: var(--white); font-size: 1.4rem; cursor: none; opacity: 0.6; transition: opacity 0.2s; }
+  .cart-close:hover { opacity: 1; }
+  .cart-items { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+  .cart-item {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 16px;
+    border-radius: 2px;
+  }
+  .cart-item-visual {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.6rem;
+  }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 4px; }
+  .cart-item-price { font-size: 0.85rem; color: var(--rust); font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; }
+  .cart-item-remove { background: none; border: none; color: var(--light-steel); cursor: none; font-size: 1rem; transition: color 0.2s; }
+  .cart-item-remove:hover { color: var(--rust); }
+  .cart-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--light-steel); gap: 12px; font-size: 0.9rem; }
+  .cart-empty-icon { font-size: 3rem; opacity: 0.3; }
+  .cart-footer { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; margin-top: 24px; }
+  .cart-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .cart-total-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--light-steel); }
+  .cart-total-val { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; }
+  .cart-checkout {
+    width: 100%;
+    background: var(--rust);
+    color: var(--white);
+    border: none;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .cart-checkout:hover { background: var(--rust-dark); }
+
+  /* CART ICON */
+  .cart-btn {
+    position: relative;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    font-size: 1.1rem;
+    transition: border-color 0.2s;
+  }
+  .cart-btn:hover { border-color: var(--rust); }
+  .cart-count {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--rust);
+    color: var(--white);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    display: none;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* NOTIFICATION */
+  .notification {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-left: 3px solid var(--rust);
+    padding: 16px 20px;
+    border-radius: 2px;
+    z-index: 300;
+    font-size: 0.88rem;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.4s;
+    pointer-events: none;
+    max-width: 300px;
+  }
+  .notification.show { transform: translateY(0); opacity: 1; }
+  .notification strong { color: var(--rust); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    #hero { grid-template-columns: 1fr; text-align: center; padding: 120px 32px 80px; }
+    .hero-desc { margin: 0 auto 44px; }
+    .hero-actions { justify-content: center; }
+    .hero-stats { justify-content: center; }
+    .hero-visual { display: none; }
+    .bikes-grid { grid-template-columns: 1fr 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; gap: 2px; }
+    .features-layout { grid-template-columns: 1fr; }
+    .cta-layout { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    nav { padding: 0 24px; }
+    section { padding: 80px 32px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .cart-sidebar { width: 100%; }
+  }
+  @media (max-width: 640px) {
+    .bikes-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 20px; }
+    section { padding: 64px 20px; }
+    nav { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <div class="cart-title">YOUR CART</div>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🚲</div>
+      <div>Your cart is empty</div>
+      <div style="font-size:0.78rem;opacity:0.6">Add a bike to get started</div>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <div class="cart-total-label">Total</div>
+      <div class="cart-total-val" id="cartTotal">$0</div>
+    </div>
+    <button class="cart-checkout" onclick="checkout()">Checkout →</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">VEL<span>O</span></a>
+  <ul class="nav-links">
+    <li><a href="#bikes">Bikes</a></li>
+    <li><a href="#features">Services</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" class="nav-cta">Book a Test Ride</a></li>
+  </ul>
+  <div style="display:flex;gap:16px;align-items:center;">
+    <button class="cart-btn" onclick="openCart()">
+      🛒
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#bikes" onclick="toggleMenu()">Bikes</a>
+  <a href="#features" onclick="toggleMenu()">Services</a>
+  <a href="#testimonials" onclick="toggleMenu()">Reviews</a>
+  <a href="#contact" onclick="toggleMenu()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Est. 2009 — Premium Cycles</div>
+    <h1>RIDE<br>WITH<br><em>VELO</em></h1>
+    <p class="hero-desc">
+      Handcrafted performance bikes built for riders who demand more. From city streets to mountain trails — we've got the perfect ride for you.
+    </p>
+    <div class="hero-actions">
+      <a href="#bikes" class="btn-primary">Shop Bikes</a>
+      <a href="#contact" class="btn-outline">Book a Test Ride</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">12<span>K+</span></div>
+        <div class="stat-label">Happy Riders</div>
+      </div>
+      <div>
+        <div class="stat-num">340<span>+</span></div>
+        <div class="stat-label">Bike Models</div>
+      </div>
+      <div>
+        <div class="stat-num">15<span>yr</span></div>
+        <div class="stat-label">Experience</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-accent-ring"></div>
+    <div class="hero-accent-ring hero-accent-ring-2"></div>
+    <div class="hero-bike-svg">
+      <svg viewBox="0 0 560 360" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: float 4s ease-in-out infinite;">
+        <!-- Rear Wheel -->
+        <circle cx="140" cy="240" r="95" stroke="#333" stroke-width="10"/>
+        <circle cx="140" cy="240" r="80" stroke="#222" stroke-width="4"/>
+        <circle cx="140" cy="240" r="14" fill="#c84b2f"/>
+        <!-- Spokes rear -->
+        <g stroke="#2a2a2a" stroke-width="2.5">
+          <line x1="140" y1="145" x2="140" y2="335"/>
+          <line x1="45" y1="240" x2="235" y2="240"/>
+          <line x1="72.7" y1="172.7" x2="207.3" y2="307.3"/>
+          <line x1="207.3" y1="172.7" x2="72.7" y2="307.3"/>
+          <line x1="50" y1="205" x2="230" y2="275"/>
+          <line x1="50" y1="275" x2="230" y2="205"/>
+        </g>
+        <!-- Front Wheel -->
+        <circle cx="420" cy="240" r="95" stroke="#333" stroke-width="10"/>
+        <circle cx="420" cy="240" r="80" stroke="#222" stroke-width="4"/>
+        <circle cx="420" cy="240" r="14" fill="#c84b2f"/>
+        <!-- Spokes front -->
+        <g stroke="#2a2a2a" stroke-width="2.5">
+          <line x1="420" y1="145" x2="420" y2="335"/>
+          <line x1="325" y1="240" x2="515" y2="240"/>
+          <line x1="352.7" y1="172.7" x2="487.3" y2="307.3"/>
+          <line x1="487.3" y1="172.7" x2="352.7" y2="307.3"/>
+          <line x1="330" y1="205" x2="510" y2="275"/>
+          <line x1="330" y1="275" x2="510" y2="205"/>
+        </g>
+        <!-- Frame -->
+        <path d="M140 240 L260 120 L360 120 L420 240" stroke="#c84b2f" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M260 120 L200 240" stroke="#c84b2f" stroke-width="10" stroke-linecap="round"/>
+        <path d="M200 240 L140 240" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+        <!-- Chain Stay -->
+        <path d="M140 240 L200 240" stroke="#666" stroke-width="6" stroke-linecap="round"/>
+        <!-- Fork -->
+        <path d="M360 120 L420 240" stroke="#999" stroke-width="10" stroke-linecap="round"/>
+        <path d="M360 120 L370 75" stroke="#999" stroke-width="10" stroke-linecap="round"/>
+        <!-- Handlebars -->
+        <path d="M370 75 L395 70 M370 75 L345 80" stroke="#c84b2f" stroke-width="8" stroke-linecap="round"/>
+        <!-- Seat post -->
+        <path d="M260 120 L255 75" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+        <!-- Saddle -->
+        <path d="M235 72 Q255 60 275 72" stroke="#c84b2f" stroke-width="10" stroke-linecap="round"/>
+        <!-- Bottom Bracket -->
+        <circle cx="200" cy="240" r="16" fill="#1a1a1a" stroke="#c84b2f" stroke-width="4"/>
+        <!-- Pedals -->
+        <line x1="175" y1="250" x2="160" y2="258" stroke="#888" stroke-width="5" stroke-linecap="round"/>
+        <line x1="225" y1="230" x2="240" y2="222" stroke="#888" stroke-width="5" stroke-linecap="round"/>
+        <!-- Chain -->
+        <path d="M200 240 Q280 265 315 248 Q340 237 360 248 Q380 258 380 240 Q380 225 360 232 Q340 240 315 225 Q280 212 200 240" stroke="#555" stroke-width="3" fill="none" opacity="0.5"/>
+        <!-- Glow accent -->
+        <ellipse cx="280" cy="240" rx="180" ry="15" fill="url(#glowGrad)" opacity="0.3"/>
+        <defs>
+          <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#c84b2f" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#c84b2f" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack">
+    <div class="marquee-item">Mountain Bikes</div>
+    <div class="marquee-item">Road Bikes</div>
+    <div class="marquee-item">Electric Bikes</div>
+    <div class="marquee-item">City Cruisers</div>
+    <div class="marquee-item">BMX</div>
+    <div class="marquee-item">Gravel Bikes</div>
+    <div class="marquee-item">Accessories</div>
+    <div class="marquee-item">Expert Service</div>
+    <div class="marquee-item">Test Rides</div>
+    <div class="marquee-item">Mountain Bikes</div>
+    <div class="marquee-item">Road Bikes</div>
+    <div class="marquee-item">Electric Bikes</div>
+    <div class="marquee-item">City Cruisers</div>
+    <div class="marquee-item">BMX</div>
+    <div class="marquee-item">Gravel Bikes</div>
+    <div class="marquee-item">Accessories</div>
+    <div class="marquee-item">Expert Service</div>
+    <div class="marquee-item">Test Rides</div>
+  </div>
+</div>
+
+<!-- BIKES -->
+<section id="bikes">
+  <div class="section-header reveal">
+    <div class="section-tag">Our Collection</div>
+    <div class="section-title">FIND YOUR<br>PERFECT RIDE</div>
+    <p class="section-sub">Each bike is meticulously engineered for performance, comfort, and style — ready for any terrain.</p>
+  </div>
+  <div class="bikes-grid">
+
+    <div class="bike-card reveal reveal-delay-1">
+      <div class="bike-card-glow"></div>
+      <div class="bike-card-inner">
+        <span class="bike-badge badge-new">New 2025</span>
+        <div class="bike-visual">
+          <div class="bike-svg-container">
+            <svg width="220" height="140" viewBox="0 0 220 140" fill="none">
+              <circle cx="55" cy="95" r="38" stroke="#c84b2f" stroke-width="5"/>
+              <circle cx="55" cy="95" r="25" stroke="#333" stroke-width="2"/>
+              <circle cx="55" cy="95" r="6" fill="#c84b2f"/>
+              <circle cx="165" cy="95" r="38" stroke="#c84b2f" stroke-width="5"/>
+              <circle cx="165" cy="95" r="25" stroke="#333" stroke-width="2"/>
+              <circle cx="165" cy="95" r="6" fill="#c84b2f"/>
+              <path d="M55 95 L100 48 L140 48 L165 95" stroke="#c84b2f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M100 48 L78 95" stroke="#888" stroke-width="5" stroke-linecap="round"/>
+              <path d="M140 48 L148 25 M148 25 L162 22 M148 25 L135 28" stroke="#aaa" stroke-width="5" stroke-linecap="round"/>
+              <path d="M100 48 L97 28 M91 26 Q97 22 103 26" stroke="#c84b2f" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="78" cy="95" r="7" fill="#1a1a1a" stroke="#c84b2f" stroke-width="3"/>
+              <g stroke="#3a3a3a" stroke-width="1.5">
+                <line x1="55" y1="57" x2="55" y2="133"/>
+                <line x1="17" y1="95" x2="93" y2="95"/>
+                <line x1="28" y1="68" x2="82" y2="122"/>
+                <line x1="82" y1="68" x2="28" y2="122"/>
+                <line x1="165" y1="57" x2="165" y2="133"/>
+                <line x1="127" y1="95" x2="203" y2="95"/>
+                <line x1="138" y1="68" x2="192" y2="122"/>
+                <line x1="192" y1="68" x2="138" y2="122"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="bike-model">Mountain Series</div>
+        <div class="bike-name">APEX PRO 29</div>
+        <div class="bike-desc">Full suspension trail blazer with carbon fiber frame. Conquers any terrain with confidence.</div>
+        <div class="bike-specs">
+          <div class="spec-item"><div class="spec-val">29"</div><div class="spec-key">Wheels</div></div>
+          <div class="spec-item"><div class="spec-val">12kg</div><div class="spec-key">Weight</div></div>
+          <div class="spec-item"><div class="spec-val">12sp</div><div class="spec-key">Speed</div></div>
+        </div>
+        <div class="bike-footer">
+          <div class="bike-price">$3,299</div>
+          <button class="add-btn" onclick="addToCart('APEX PRO 29', 3299)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bike-card reveal reveal-delay-2">
+      <div class="bike-card-glow"></div>
+      <div class="bike-card-inner">
+        <span class="bike-badge badge-popular">Best Seller</span>
+        <div class="bike-visual">
+          <div class="bike-svg-container">
+            <svg width="220" height="140" viewBox="0 0 220 140" fill="none">
+              <circle cx="55" cy="95" r="36" stroke="#888" stroke-width="4"/>
+              <circle cx="55" cy="95" r="22" stroke="#2a2a2a" stroke-width="2"/>
+              <circle cx="55" cy="95" r="5" fill="#888"/>
+              <circle cx="165" cy="95" r="36" stroke="#888" stroke-width="4"/>
+              <circle cx="165" cy="95" r="22" stroke="#2a2a2a" stroke-width="2"/>
+              <circle cx="165" cy="95" r="5" fill="#888"/>
+              <path d="M55 95 L95 55 L140 55 L165 95" stroke="#ccc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M95 55 L78 95" stroke="#999" stroke-width="4" stroke-linecap="round"/>
+              <path d="M140 55 L148 30 M148 30 L160 28 M148 30 L137 33" stroke="#bbb" stroke-width="4" stroke-linecap="round"/>
+              <path d="M95 55 L92 32 M87 30 Q93 26 99 30" stroke="#bbb" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="78" cy="95" r="6" fill="#111" stroke="#888" stroke-width="3"/>
+              <g stroke="#2a2a2a" stroke-width="1.5">
+                <line x1="55" y1="59" x2="55" y2="131"/>
+                <line x1="19" y1="95" x2="91" y2="95"/>
+                <line x1="29" y1="69" x2="81" y2="121"/>
+                <line x1="81" y1="69" x2="29" y2="121"/>
+                <line x1="165" y1="59" x2="165" y2="131"/>
+                <line x1="129" y1="95" x2="201" y2="95"/>
+                <line x1="139" y1="69" x2="191" y2="121"/>
+                <line x1="191" y1="69" x2="139" y2="121"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="bike-model">Road Series</div>
+        <div class="bike-name">SWIFT R7</div>
+        <div class="bike-desc">Aerodynamic road racer with integrated cockpit. Born to race, built to win every morning commute.</div>
+        <div class="bike-specs">
+          <div class="spec-item"><div class="spec-val">700c</div><div class="spec-key">Wheels</div></div>
+          <div class="spec-item"><div class="spec-val">8.2kg</div><div class="spec-key">Weight</div></div>
+          <div class="spec-item"><div class="spec-val">22sp</div><div class="spec-key">Speed</div></div>
+        </div>
+        <div class="bike-footer">
+          <div class="bike-price">$2,499</div>
+          <button class="add-btn" onclick="addToCart('SWIFT R7', 2499)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bike-card reveal reveal-delay-3">
+      <div class="bike-card-glow"></div>
+      <div class="bike-card-inner">
+        <span class="bike-badge badge-sale">Sale −20%</span>
+        <div class="bike-visual">
+          <div class="bike-svg-container">
+            <svg width="220" height="140" viewBox="0 0 220 140" fill="none">
+              <!-- E-bike with battery indicator -->
+              <circle cx="55" cy="95" r="38" stroke="#3498db" stroke-width="5"/>
+              <circle cx="55" cy="95" r="25" stroke="#1a3a5c" stroke-width="2"/>
+              <circle cx="55" cy="95" r="6" fill="#3498db"/>
+              <circle cx="165" cy="95" r="38" stroke="#3498db" stroke-width="5"/>
+              <circle cx="165" cy="95" r="25" stroke="#1a3a5c" stroke-width="2"/>
+              <circle cx="165" cy="95" r="6" fill="#3498db"/>
+              <path d="M55 95 L100 50 L145 50 L165 95" stroke="#3498db" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M100 50 L80 95" stroke="#5dade2" stroke-width="5" stroke-linecap="round"/>
+              <rect x="108" y="56" width="30" height="14" rx="2" fill="#1a3a5c" stroke="#3498db" stroke-width="2"/>
+              <rect x="110" y="58" width="10" height="10" rx="1" fill="#3498db"/>
+              <path d="M145 50 L152 28 M152 28 L164 25 M152 28 L141 31" stroke="#5dade2" stroke-width="5" stroke-linecap="round"/>
+              <path d="M100 50 L97 30 M91 28 Q97 24 103 28" stroke="#5dade2" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="80" cy="95" r="7" fill="#0a0a0a" stroke="#3498db" stroke-width="3"/>
+              <!-- Lightning bolt on frame -->
+              <path d="M117 56 L113 64 L118 64 L114 72" stroke="#f1c40f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <g stroke="#1a3a5c" stroke-width="1.5">
+                <line x1="55" y1="57" x2="55" y2="133"/>
+                <line x1="17" y1="95" x2="93" y2="95"/>
+                <line x1="28" y1="68" x2="82" y2="122"/>
+                <line x1="82" y1="68" x2="28" y2="122"/>
+                <line x1="165" y1="57" x2="165" y2="133"/>
+                <line x1="127" y1="95" x2="203" y2="95"/>
+                <line x1="138" y1="68" x2="192" y2="122"/>
+                <line x1="192" y1="68" x2="138" y2="122"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="bike-model">E-Bike Series</div>
+        <div class="bike-name">VOLT E1</div>
+        <div class="bike-desc">Smart electric commuter with 80km range. Pedal-assist technology meets modern design.</div>
+        <div class="bike-specs">
+          <div class="spec-item"><div class="spec-val">80km</div><div class="spec-key">Range</div></div>
+          <div class="spec-item"><div class="spec-val">250W</div><div class="spec-key">Motor</div></div>
+          <div class="spec-item"><div class="spec-val">7sp</div><div class="spec-key">Speed</div></div>
+        </div>
+        <div class="bike-footer">
+          <div class="bike-price"><span class="old">$3,199</span>$2,559</div>
+          <button class="add-btn" onclick="addToCart('VOLT E1', 2559)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bike-card reveal reveal-delay-2">
+      <div class="bike-card-glow"></div>
+      <div class="bike-card-inner">
+        <span class="bike-badge badge-popular">City Fave</span>
+        <div class="bike-visual">
+          <div class="bike-svg-container">
+            <svg width="220" height="140" viewBox="0 0 220 140" fill="none">
+              <circle cx="55" cy="95" r="37" stroke="#f39c12" stroke-width="5"/>
+              <circle cx="55" cy="95" r="24" stroke="#3a2a0a" stroke-width="2"/>
+              <circle cx="55" cy="95" r="5" fill="#f39c12"/>
+              <circle cx="165" cy="95" r="37" stroke="#f39c12" stroke-width="5"/>
+              <circle cx="165" cy="95" r="24" stroke="#3a2a0a" stroke-width="2"/>
+              <circle cx="165" cy="95" r="5" fill="#f39c12"/>
+              <!-- City bike: upright geometry, basket area -->
+              <path d="M55 95 L100 62 L145 62 L165 95" stroke="#f39c12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M100 62 L85 95" stroke="#c87f10" stroke-width="4" stroke-linecap="round"/>
+              <path d="M145 62 L148 40 M148 40 L138 37 M148 40 L158 43" stroke="#c87f10" stroke-width="5" stroke-linecap="round"/>
+              <path d="M100 62 L98 42 M92 40 Q98 36 104 40" stroke="#f39c12" stroke-width="5" stroke-linecap="round"/>
+              <!-- Basket -->
+              <rect x="82" y="38" width="24" height="16" rx="2" fill="none" stroke="#f39c12" stroke-width="2"/>
+              <line x1="90" y1="38" x2="90" y2="54" stroke="#f39c12" stroke-width="1.5"/>
+              <line x1="98" y1="38" x2="98" y2="54" stroke="#f39c12" stroke-width="1.5"/>
+              <circle cx="85" cy="95" r="6" fill="#111" stroke="#f39c12" stroke-width="3"/>
+              <g stroke="#3a2a0a" stroke-width="1.5">
+                <line x1="55" y1="58" x2="55" y2="132"/>
+                <line x1="18" y1="95" x2="92" y2="95"/>
+                <line x1="29" y1="69" x2="81" y2="121"/>
+                <line x1="81" y1="69" x2="29" y2="121"/>
+                <line x1="165" y1="58" x2="165" y2="132"/>
+                <line x1="128" y1="95" x2="202" y2="95"/>
+                <line x1="139" y1="69" x2="191" y2="121"/>
+                <line x1="191" y1="69" x2="139" y2="121"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="bike-model">Urban Series</div>
+        <div class="bike-name">METRO GLIDE</div>
+        <div class="bike-desc">The ultimate city companion. Comfortable upright seating with integrated lighting and rack.</div>
+        <div class="bike-specs">
+          <div class="spec-item"><div class="spec-val">700c</div><div class="spec-key">Wheels</div></div>
+          <div class="spec-item"><div class="spec-val">11kg</div><div class="spec-key">Weight</div></div>
+          <div class="spec-item"><div class="spec-val">8sp</div><div class="spec-key">Speed</div></div>
+        </div>
+        <div class="bike-footer">
+          <div class="bike-price">$1,299</div>
+          <button class="add-btn" onclick="addToCart('METRO GLIDE', 1299)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bike-card reveal reveal-delay-3">
+      <div class="bike-card-glow"></div>
+      <div class="bike-card-inner">
+        <span class="bike-badge badge-new">Limited</span>
+        <div class="bike-visual">
+          <div class="bike-svg-container">
+            <svg width="220" height="140" viewBox="0 0 220 140" fill="none">
+              <!-- Gravel bike -->
+              <circle cx="55" cy="95" r="38" stroke="#9b59b6" stroke-width="5"/>
+              <circle cx="55" cy="95" r="24" stroke="#2c1a3a" stroke-width="2"/>
+              <circle cx="55" cy="95" r="6" fill="#9b59b6"/>
+              <circle cx="165" cy="95" r="38" stroke="#9b59b6" stroke-width="5"/>
+              <circle cx="165" cy="95" r="24" stroke="#2c1a3a" stroke-width="2"/>
+              <circle cx="165" cy="95" r="6" fill="#9b59b6"/>
+              <path d="M55 95 L98 52 L142 52 L165 95" stroke="#9b59b6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M98 52 L79 95" stroke="#7d3c98" stroke-width="5" stroke-linecap="round"/>
+              <path d="M142 52 L150 28 M150 28 L163 26 M150 28 L138 31" stroke="#bb8fce" stroke-width="4" stroke-linecap="round"/>
+              <path d="M98 52 L95 30 M89 28 Q95 24 101 28" stroke="#bb8fce" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="79" cy="95" r="7" fill="#0a0a0a" stroke="#9b59b6" stroke-width="3"/>
+              <!-- Drop bars suggestion -->
+              <path d="M163 26 L170 22 Q175 20 175 25 L174 30" stroke="#9b59b6" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+              <g stroke="#2c1a3a" stroke-width="1.5">
+                <line x1="55" y1="57" x2="55" y2="133"/>
+                <line x1="17" y1="95" x2="93" y2="95"/>
+                <line x1="28" y1="68" x2="82" y2="122"/>
+                <line x1="82" y1="68" x2="28" y2="122"/>
+                <line x1="165" y1="57" x2="165" y2="133"/>
+                <line x1="127" y1="95" x2="203" y2="95"/>
+                <line x1="138" y1="68" x2="192" y2="122"/>
+                <line x1="192" y1="68" x2="138" y2="122"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="bike-model">Gravel Series</div>
+        <div class="bike-name">TERRA GX1</div>
+        <div class="bike-desc">Versatile gravel crusher with drop bars. Where road ends, your adventure begins.</div>
+        <div class="bike-specs">
+          <div class="spec-item"><div class="spec-val">700c</div><div class="spec-key">Wheels</div></div>
+          <div class="spec-item"><div class="spec-val">9.5kg</div><div class="spec-key">Weight</div></div>
+          <div class="spec-item"><div class="spec-val">11sp</div><div class="spec-key">Speed</div></div>
+        </div>
+        <div class="bike-footer">
+          <div class="bike-price">$2,149</div>
+          <button class="add-btn" onclick="addToCart('TERRA GX1', 2149)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bike-card reveal reveal-delay-4">
+      <div class="bike-card-glow"></div>
+      <div class="bike-card-inner">
+        <span class="bike-badge badge-sale">Kids Deal</span>
+        <div class="bike-visual">
+          <div class="bike-svg-container">
+            <svg width="220" height="140" viewBox="0 0 220 140" fill="none">
+              <!-- Smaller kids BMX style -->
+              <circle cx="70" cy="98" r="32" stroke="#e74c3c" stroke-width="5"/>
+              <circle cx="70" cy="98" r="20" stroke="#3a0a0a" stroke-width="2"/>
+              <circle cx="70" cy="98" r="5" fill="#e74c3c"/>
+              <circle cx="160" cy="98" r="32" stroke="#e74c3c" stroke-width="5"/>
+              <circle cx="160" cy="98" r="20" stroke="#3a0a0a" stroke-width="2"/>
+              <circle cx="160" cy="98" r="5" fill="#e74c3c"/>
+              <path d="M70 98 L108 60 L145 60 L160 98" stroke="#e74c3c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M108 60 L92 98" stroke="#c0392b" stroke-width="4" stroke-linecap="round"/>
+              <path d="M145 60 L150 40 M150 40 L138 38 M150 40 L162 43" stroke="#e74c3c" stroke-width="4" stroke-linecap="round"/>
+              <path d="M108 60 L106 42 M101 40 Q106 36 111 40" stroke="#e74c3c" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="92" cy="98" r="6" fill="#0a0a0a" stroke="#e74c3c" stroke-width="3"/>
+              <g stroke="#3a0a0a" stroke-width="1.5">
+                <line x1="70" y1="66" x2="70" y2="130"/>
+                <line x1="38" y1="98" x2="102" y2="98"/>
+                <line x1="47" y1="75" x2="93" y2="121"/>
+                <line x1="93" y1="75" x2="47" y2="121"/>
+                <line x1="160" y1="66" x2="160" y2="130"/>
+                <line x1="128" y1="98" x2="192" y2="98"/>
+                <line x1="137" y1="75" x2="183" y2="121"/>
+                <line x1="183" y1="75" x2="137" y2="121"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="bike-model">Kids Series</div>
+        <div class="bike-name">SPROUT 24</div>
+        <div class="bike-desc">The perfect first real bike. Lightweight, safe, and loads of fun for young adventurers.</div>
+        <div class="bike-specs">
+          <div class="spec-item"><div class="spec-val">24"</div><div class="spec-key">Wheels</div></div>
+          <div class="spec-item"><div class="spec-val">7kg</div><div class="spec-key">Weight</div></div>
+          <div class="spec-item"><div class="spec-val">7sp</div><div class="spec-key">Speed</div></div>
+        </div>
+        <div class="bike-footer">
+          <div class="bike-price"><span class="old">$599</span>$449</div>
+          <button class="add-btn" onclick="addToCart('SPROUT 24', 449)">+</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURES / SERVICES -->
+<section id="features">
+  <div class="features-layout">
+    <div>
+      <div class="section-tag reveal">Why Choose VELO</div>
+      <div class="section-title reveal reveal-delay-1">MORE THAN<br>JUST A BIKE</div>
+      <p class="section-sub reveal reveal-delay-2">We're not just a shop — we're your cycling partner. From your first purchase to your thousandth mile.</p>
+      <div class="features-list">
+        <div class="feature-item reveal">
+          <div class="feature-icon">🔧</div>
+          <div>
+            <div class="feature-item-title">Expert Assembly & Fit</div>
+            <div class="feature-item-desc">Every bike is professionally assembled and custom-fitted to your body dimensions before you ride away.</div>
+          </div>
+        </div>
+        <div class="feature-item reveal reveal-delay-1">
+          <div class="feature-icon">🛡️</div>
+          <div>
+            <div class="feature-item-title">2-Year Warranty</div>
+            <div class="feature-item-desc">Full frame warranty plus comprehensive component coverage. We stand behind every bike we sell.</div>
+          </div>
+        </div>
+        <div class="feature-item reveal reveal-delay-2">
+          <div class="feature-icon">🚲</div>
+          <div>
+            <div class="feature-item-title">Free Test Rides</div>
+            <div class="feature-item-desc">Ride before you buy. Our test fleet lets you feel the difference before committing to a purchase.</div>
+          </div>
+        </div>
+        <div class="feature-item reveal reveal-delay-3">
+          <div class="feature-icon">📦</div>
+          <div>
+            <div class="feature-item-title">Free Nationwide Delivery</div>
+            <div class="feature-item-desc">We ship fully assembled bikes across the country, fully insured, right to your door.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="features-visual reveal reveal-delay-2">
+      <div class="features-big-num">15</div>
+      <div class="features-image-frame">
+        <div class="frame-tag">Our Services</div>
+        <div style="text-align:center; padding: 32px 0 24px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:0.04em;margin-bottom:8px;">SERVICE CENTRE</div>
+          <div style="font-size:0.85rem;color:var(--light-steel);margin-bottom:32px;">Professional bike care & maintenance</div>
+        </div>
+        <div class="service-cards">
+          <div class="service-card">
+            <div class="service-card-icon">🔩</div>
+            <div class="service-card-title">Full Tune-Up</div>
+            <div class="service-card-sub">From $89</div>
+          </div>
+          <div class="service-card">
+            <div class="service-card-icon">⚙️</div>
+            <div class="service-card-title">Gear Service</div>
+            <div class="service-card-sub">From $49</div>
+          </div>
+          <div class="service-card">
+            <div class="service-card-icon">🛞</div>
+            <div class="service-card-title">Wheel True</div>
+            <div class="service-card-sub">From $35</div>
+          </div>
+          <div class="service-card">
+            <div class="service-card-icon">🎨</div>
+            <div class="service-card-title">Custom Paint</div>
+            <div class="service-card-sub">From $199</div>
+          </div>
+        </div>
+        <div style="margin-top:24px;text-align:center;">
+          <a href="#contact" class="btn-primary" style="display:inline-block;padding:12px 28px;font-size:0.82rem;">Book Service</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-header reveal">
+    <div class="section-tag">Reviews</div>
+    <div class="section-title">WHAT RIDERS<br>ARE SAYING</div>
+    <p class="section-sub">Don't take our word for it — hear from the community of riders who trust VELO.</p>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"The APEX PRO transformed my weekend rides. The staff helped me dial in the perfect fit and the customer service has been outstanding ever since."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">JR</div>
+        <div>
+          <div class="author-name">James R.</div>
+          <div class="author-detail">Mountain Biker · Austin, TX</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Switched to the VOLT E1 for my daily commute and haven't looked back. The range is incredible and VELO's service team is always ready to help."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">SP</div>
+        <div>
+          <div class="author-name">Sophia P.</div>
+          <div class="author-detail">Daily Commuter · Portland, OR</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Got my daughter the SPROUT 24 and she absolutely loves it. High quality, great price, and the team was incredibly helpful in choosing the right size."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">MK</div>
+        <div>
+          <div class="author-name">Marcus K.</div>
+          <div class="author-detail">Parent & Rider · Denver, CO</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="cta-layout">
+    <div>
+      <div class="section-tag reveal">Get In Touch</div>
+      <div class="section-title reveal reveal-delay-1">BOOK A TEST<br>RIDE TODAY</div>
+      <p class="section-sub reveal reveal-delay-2">Ready to find your perfect bike? Book a test ride, ask us anything, or book a service. We're here to help.</p>
+      <div class="contact-info reveal reveal-delay-2">
+        <div class="info-block">
+          <div class="info-label">📍 Location</div>
+          <div class="info-val">142 Cycle Lane, Bike District<br>San Francisco, CA 94102</div>
+        </div>
+        <div class="info-block">
+          <div class="info-label">📞 Phone</div>
+          <div class="info-val">+1 (415) 555-VELO</div>
+        </div>
+        <div class="info-block">
+          <div class="info-label">🕐 Hours</div>
+          <div class="hours-grid">
+            <div class="hours-day">Mon – Fri</div><div class="hours-time">9:00 AM – 7:00 PM</div>
+            <div class="hours-day">Saturday</div><div class="hours-time">9:00 AM – 6:00 PM</div>
+            <div class="hours-day">Sunday</div><div class="hours-time">11:00 AM – 5:00 PM</div>
+          </div>
+        </div>
+        <div class="map-placeholder">
+          <div class="map-pin">📍</div>
+          <div style="position:relative;z-index:1;margin-left:10px;font-size:0.82rem;">142 Cycle Lane, San Francisco</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div style="margin-bottom:8px;margin-top:20px;">
+        <div class="section-tag" style="margin-bottom:0">Quick Contact</div>
+      </div>
+      <form class="contact-form" onsubmit="submitForm(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" placeholder="Alex" required/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" placeholder="Johnson" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="alex@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" placeholder="+1 (555) 000-0000"/>
+        </div>
+        <div class="form-group">
+          <label>I'm interested in…</label>
+          <select>
+            <option>Test Ride</option>
+            <option>Purchasing a Bike</option>
+            <option>Bike Service</option>
+            <option>Custom Build</option>
+            <option>General Inquiry</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea placeholder="Tell us about yourself and what you're looking for…"></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send Message →</button>
+        <div class="form-success" id="formSuccess">
+          ✓ Message sent! We'll be in touch within 24 hours.
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">VEL<span>O</span></div>
+      <p>Premium bikes and cycling gear for every rider. From the first pedal stroke to the summit — we ride with you.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="#bikes">Mountain Bikes</a></li>
+        <li><a href="#bikes">Road Bikes</a></li>
+        <li><a href="#bikes">E-Bikes</a></li>
+        <li><a href="#bikes">City Bikes</a></li>
+        <li><a href="#bikes">Kids Bikes</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#features">Bike Fitting</a></li>
+        <li><a href="#features">Full Tune-Up</a></li>
+        <li><a href="#features">Custom Builds</a></li>
+        <li><a href="#contact">Test Rides</a></li>
+        <li><a href="#features">Repairs</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About VELO</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 VELO Bike Store. All rights reserved.</div>
+    <div class="social-links">
+      <a href="#" class="social-link" title="Instagram">📸</a>
+      <a href="#" class="social-link" title="Facebook">f</a>
+      <a href="#" class="social-link" title="YouTube">▶</a>
+      <a href="#" class="social-link" title="X / Twitter">𝕏</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // --- CURSOR ---
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - 18}px, ${ry - 18}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+  document.querySelectorAll('a, button, .bike-card, .service-card, .social-link, .feature-item').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // --- NAV SCROLL ---
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // --- MOBILE MENU ---
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // --- SCROLL REVEAL ---
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // --- CART ---
+  let cart = [];
+  function addToCart(name, price) {
+    const existing = cart.find(i => i.name === name);
+    if (existing) { existing.qty++; }
+    else { cart.push({ name, price, qty: 1 }); }
+    updateCart();
+    showNotification(`<strong>${name}</strong> added to cart!`);
+  }
+  function removeFromCart(idx) {
+    cart.splice(idx, 1);
+    updateCart();
+  }
+  function updateCart() {
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    const countEl = document.getElementById('cartCount');
+    countEl.textContent = count;
+    countEl.style.display = count > 0 ? 'flex' : 'none';
+    document.getElementById('cartTotal').textContent = '$' + total.toLocaleString();
+    const itemsEl = document.getElementById('cartItems');
+    if (cart.length === 0) {
+      itemsEl.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🚲</div><div>Your cart is empty</div><div style="font-size:0.78rem;opacity:0.6">Add a bike to get started</div></div>`;
+    } else {
+      itemsEl.innerHTML = cart.map((item, idx) => `
+        <div class="cart-item">
+          <div class="cart-item-visual">🚲</div>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}${item.qty > 1 ? ' × ' + item.qty : ''}</div>
+            <div class="cart-item-price">$${(item.price * item.qty).toLocaleString()}</div>
+          </div>
+          <button class="cart-item-remove" onclick="removeFromCart(${idx})">✕</button>
+        </div>
+      `).join('');
+    }
+  }
+  function openCart() {
+    document.getElementById('cartSidebar').classList.add('open');
+    document.getElementById('cartOverlay').classList.add('open');
+  }
+  function closeCart() {
+    document.getElementById('cartSidebar').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+  }
+  function checkout() {
+    if (cart.length === 0) { showNotification('Your cart is empty!'); return; }
+    showNotification('🎉 Order placed! We\'ll contact you soon.');
+    cart = [];
+    updateCart();
+    closeCart();
+  }
+
+  // --- NOTIFICATION ---
+  function showNotification(msg) {
+    const el = document.getElementById('notification');
+    el.innerHTML = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  // --- FORM ---
+  function submitForm(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.form-submit');
+    btn.textContent = 'Sending…';
+    btn.disabled = true;
+    setTimeout(() => {
+      document.getElementById('formSuccess').style.display = 'block';
+      btn.textContent = 'Send Message →';
+      btn.disabled = false;
+      e.target.reset();
+    }, 1200);
+  }
+</script>
+</body>
+</html>
